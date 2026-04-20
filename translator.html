@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Code Translator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #eee;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #00d9ff;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .translator-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00d9ff;
+            font-weight: 600;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+        }
+        textarea::placeholder {
+            color: #666;
+        }
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        button {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-translate {
+            background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%);
+            color: #000;
+        }
+        .btn-translate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+        }
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .btn-copy {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: #fff;
+        }
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4);
+        }
+        .reference {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .reference h2 {
+            color: #00d9ff;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .ref-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .ref-section h3 {
+            color: #9b59b6;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .ref-section ul {
+            list-style: none;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #aaa;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .ref-section ul li {
+            padding: 0.2rem 0;
+        }
+        .ref-section ul li span {
+            color: #00d9ff;
+        }
+        .feedback-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: linear-gradient(135deg, #5e6ad2 0%, #4f46e5 100%);
+            color: #fff;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(94, 106, 210, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .feedback-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(94, 106, 210, 0.6);
+        }
+        @media (max-width: 600px) {
+            .ref-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-row {
+                flex-direction: column;
+            }
+            .feedback-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Secret Code Translator</h1>
+        <p class="subtitle">English → Cipher | Sounds prioritized over letters</p>
+        <a href="https://linear.app/0pon/team/0PO/new" target="_blank" class="feedback-btn" title="Submit feedback or report issues">
+            💬 Feedback
+        </a>
+
+        <div class="translator-box">
+            <label for="input">English Text</label>
+            <textarea id="input" placeholder="Type your message here..."></textarea>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-translate" onclick="translate()">Translate →</button>
+            <button class="btn-clear" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="translator-box">
+            <label for="output">Encoded Output</label>
+            <textarea id="output" readonly placeholder="Translation will appear here..."></textarea>
+            <div style="margin-top: 0.5rem; text-align: right;">
+                <button class="btn-copy" onclick="copyOutput()">Copy</button>
+            </div>
+        </div>
+
+        <div class="reference">
+            <h2>Quick Reference</h2>
+            <div class="ref-grid">
+                <div class="ref-section">
+                    <h3>Terms</h3>
+                    <ul>
+                        <li><span>+</span> = love</li>
+                        <li><span>%</span> = and</li>
+                        <li><span>(</span> = he</li>
+                        <li><span>)</span> = she</li>
+                        <li><span>~</span> = come</li>
+                        <li><span>o</span> = miss</li>
+                        <li><span>#</span> = kill</li>
+                        <li><span>##</span> = murder</li>
+                        <li><span>jk</span> = just kidding</li>
+                        <li><span>IRL</span> = in real life</li>
+                        <li><span>..</span> = period (.)</li>
+                        <li><span>**</span> = question (?)</li>
+                        <li><span>*?</span> = explain</li>
+                        <li><span>;</span> = past tense</li>
+                    </ul>
+                </div>
+                <div class="ref-section">
+                    <h3>Sounds</h3>
+                    <ul>
+                        <li><span>{</span> = th</li>
+                        <li><span>$</span> = sh</li>
+                        <li><span>}</span> = ph</li>
+                        <li><span>[</span> = st</li>
+                        <li><span>]</span> = sp</li>
+                        <li><span><</span> = sk</li>
+                        <li><span>></span> = ng</li>
+                        <li><span>.y</span> = nt</li>
+                        <li><span>.v</span> = nd</li>
+                        <li><span>.h</span> = rd</li>
+                        <li><span>.w</span> = rk</li>
+                        <li><span>.o</span> = ld</li>
+                        <li><span>.j</span> = lt</li>
+                        <li><span>.b</span> = sw</li>
+                        <li><span>&</span> = ought</li>
+                    </ul>
+                </div>
+                <div class="ref-section">
+                    <h3>Vowel Sounds</h3>
+                    <ul>
+                        <li><span>5</span> = ha</li>
+                        <li><span>4</span> = eh</li>
+                        <li><span>2</span> = uh</li>
+                        <li><span>3</span> = oh</li>
+                        <li><span>"</span> = oo</li>
+                        <li><span>^</span> = ee</li>
+                        <li><span>7</span> = ey</li>
+                        <li><span>M</span> = ay/eye</li>
+                        <li><span>'</span> = ow</li>
+                        <li><span>`</span> = i (in)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Terms - full words (check first)
+        const terms = {
+            'murder': '##',
+            'murdered': '##;',
+            'murdering': '##`>',
+            'kill': '#',
+            'killed': '#;',
+            'killing': '#`>',
+            'just kidding': 'jk',
+            'in real life': 'IRL',
+            'love': '+',
+            'loved': '+;',
+            'loving': '+`>',
+            'loves': '+,,',
+            'and': '%',
+            'come': '~',
+            'comes': '~,,',
+            'came': '~;',
+            'coming': '~`>',
+            'miss': 'o',
+            'missed': 'o;',
+            'missing': 'o`>',
+            'misses': 'o4,,',
+            'she': ')',
+            'he': '(',
+            "she's": '),,',
+            "he's": '(,,',
+            'her': ')4//',
+            'him': '(`@',
+            'his': '(`,,',
+            'hers': ')4//,,',
+        };
+
+        // Sounds - phonetic patterns (check second)
+        const sounds = {
+            'ought': '&',
+            'ough': '&',
+            'th': '{',
+            'sh': '$',
+            'ph': '}',
+            'st': '[',
+            'sp': ']',
+            'sk': '<',
+            'sw': '.b',
+            'ng': '>',
+            'nt': '.y',
+            'nd': '.v',
+            'rd': '.h',
+            'rk': '.w',
+            'ld': '.o',
+            'lt': '.j',
+            'ee': '^',
+            'ey': '7',
+            'ay': 'M',
+            'ow': "'",
+            'oo': '"',
+            'ha': '5',
+            'eh': '4',
+            'uh': '2',
+            'oh': '3',
+        };
+
+        // Letters - individual characters (check last)
+        const letters = {
+            'a': '-',
+            'b': 'x',
+            'c': '*',
+            'd': ';',
+            'e': '4',
+            'f': '}',
+            'g': 'C',
+            'h': '5',
+            'i': "'",
+            'j': '_',
+            'k': '*',
+            'l': '?',
+            'm': '@',
+            'n': ':',
+            'o': '3',
+            'p': '.e',
+            'q': '*!',
+            'r': '//',
+            's': ',,',
+            't': '\\\\',
+            'u': '2',
+            'v': '|',
+            'w': '!',
+            'x': '*,,',
+            'y': '.^',
+            'z': '6',
+        };
+
+        // Punctuation
+        const punctuation = {
+            '.': '..',
+            '?': '**',
+            '!': '!',
+            ',': ',',
+            "'": "'",
+            '"': '"',
+            ' ': ' ',
+            '\n': '\n',
+        };
+
+        function translate() {
+            const input = document.getElementById('input').value.toLowerCase();
+            let result = '';
+            let i = 0;
+
+            while (i < input.length) {
+                let matched = false;
+
+                // 1. Check terms first (longest match)
+                for (const [term, code] of Object.entries(terms).sort((a, b) => b[0].length - a[0].length)) {
+                    if (input.substring(i).startsWith(term)) {
+                        // Check word boundary
+                        const beforeOk = i === 0 || /[\s.,!?]/.test(input[i - 1]);
+                        const afterOk = i + term.length >= input.length || /[\s.,!?]/.test(input[i + term.length]);
+                        if (beforeOk && afterOk) {
+                            result += code;
+                            i += term.length;
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                if (matched) continue;
+
+                // 2. Check sounds (phonetic patterns)
+                for (const [sound, code] of Object.entries(sounds).sort((a, b) => b[0].length - a[0].length)) {
+                    if (input.substring(i).startsWith(sound)) {
+                        result += code;
+                        i += sound.length;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (matched) continue;
+
+                // 3. Check punctuation
+                if (punctuation[input[i]]) {
+                    result += punctuation[input[i]];
+                    i++;
+                    continue;
+                }
+
+                // 4. Check individual letters
+                if (letters[input[i]]) {
+                    result += letters[input[i]];
+                    i++;
+                    continue;
+                }
+
+                // 5. Keep unknown characters as-is
+                result += input[i];
+                i++;
+            }
+
+            document.getElementById('output').value = result;
+        }
+
+        function clearAll() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').value = '';
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+
+            const btn = document.querySelector('.btn-copy');
+            const original = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = original, 1500);
+        }
+
+        // Real-time translation as you type
+        document.getElementById('input').addEventListener('input', translate);
+    </script>
+</body>
+</html>
