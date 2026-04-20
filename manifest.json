@@ -1,0 +1,16 @@
+{
+  "name": "Soul Code Translator",
+  "short_name": "Soul Code",
+  "description": "Translate English to Soul Code cipher",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soul Code Translator</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#fafafa">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --border: #e0e0e0;
+            --accent: #333;
+            --accent-hover: #555;
+        }
+
+        .dark {
+            --bg: #0f0f0f;
+            --surface: #1a1a1a;
+            --text: #eaeaea;
+            --text-muted: #888;
+            --border: #333;
+            --accent: #ccc;
+            --accent-hover: #fff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .translator-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            border-color: var(--accent);
+            background: var(--bg);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .reference {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .ref-header {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ref-header:hover {
+            background: var(--bg);
+        }
+
+        .ref-content {
+            padding: 1rem;
+            display: none;
+        }
+
+        .ref-content.open {
+            display: block;
+        }
+
+        .ref-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .ref-section h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .ref-section ul {
+            list-style: none;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .ref-section ul li {
+            padding: 0.15rem 0;
+        }
+
+        .ref-section ul li span {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .feedback-btn {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .feedback-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .ref-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Soul Code Translator</h1>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleDarkMode()" title="Toggle dark mode">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="translator-box">
+            <div class="box-header">
+                <label id="inputLabel">Input</label>
+                <span class="stats" id="inputStats"></span>
+            </div>
+            <textarea id="input" placeholder="Enter text..."></textarea>
+        </div>
+
+        <div class="btn-row">
+            <button onclick="swapFields()" title="Swap input and output">Swap</button>
+            <button onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="translator-box">
+            <div class="box-header">
+                <label id="outputLabel">Output</label>
+                <span class="stats" id="outputStats"></span>
+            </div>
+            <textarea id="output" readonly placeholder="Translation appears here..."></textarea>
+            <div class="output-actions">
+                <button onclick="copyOutput()">Copy</button>
+                <button onclick="shareToTextarea()">Share</button>
+            </div>
+        </div>
+
+        <div class="reference">
+            <div class="ref-header" onclick="toggleReference()">
+                <span>Quick Reference</span>
+                <span id="refToggle">+</span>
+            </div>
+            <div class="ref-content" id="refContent">
+                <div class="ref-grid">
+                    <div class="ref-section">
+                        <h3>Terms</h3>
+                        <ul>
+                            <li><span>+</span> = love</li>
+                            <li><span>%</span> = and</li>
+                            <li><span>(</span> = he</li>
+                            <li><span>)</span> = she</li>
+                            <li><span>~</span> = come/cum</li>
+                            <li><span>o</span> = miss</li>
+                            <li><span>#</span> = kill</li>
+                            <li><span>##</span> = murder</li>
+                            <li><span>jk</span> = just kidding</li>
+                            <li><span>IRL</span> = in real life</li>
+                            <li><span>..</span> = period (.)</li>
+                            <li><span>**</span> = question (?)</li>
+                            <li><span>;</span> = past tense / d</li>
+                        </ul>
+                    </div>
+                    <div class="ref-section">
+                        <h3>Sounds</h3>
+                        <ul>
+                            <li><span>{</span> = th</li>
+                            <li><span>$</span> = sh</li>
+                            <li><span>[</span> = st</li>
+                            <li><span>]</span> = sp</li>
+                            <li><span><</span> = sk</li>
+                            <li><span>></span> = ng</li>
+                            <li><span>V</span> = tr</li>
+                            <li><span>.y</span> = nt</li>
+                            <li><span>.v</span> = nd</li>
+                            <li><span>.h</span> = rd</li>
+                            <li><span>.w</span> = rk</li>
+                            <li><span>.o</span> = ld</li>
+                            <li><span>.j</span> = lt</li>
+                            <li><span>.b</span> = sw</li>
+                            <li><span>&</span> = ought</li>
+                        </ul>
+                    </div>
+                    <div class="ref-section">
+                        <h3>Vowels/Letters</h3>
+                        <ul>
+                            <li><span>"</span> = oo</li>
+                            <li><span>^</span> = ee</li>
+                            <li><span>7</span> = ey</li>
+                            <li><span>M</span> = ay/eye</li>
+                            <li><span>5</span> = h</li>
+                            <li><span>4</span> = e</li>
+                            <li><span>2</span> = u</li>
+                            <li><span>`</span> = i</li>
+                            <li><span>3</span> = o</li>
+                            <li><span>}</span> = f</li>
+                            <li><span>_</span> = j</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://linear.app/0pon/team/0PO/new?title=%5Bsc%5D%20" target="_blank" class="feedback-btn">Feedback</a>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Terms - full words (check first)
+        const terms = {
+            'murder': '##',
+            'murdered': '##;',
+            'murdering': '##`>',
+            'murders': '##,,',
+            'kill': '#',
+            'killed': '#;',
+            'killing': '#`>',
+            'kills': '#,,',
+            'just kidding': 'jk',
+            'in real life': 'IRL',
+            'love': '+',
+            'loved': '+;',
+            'loving': '+`>',
+            'loves': '+,,',
+            'and': '%',
+            'come': '~',
+            'cum': '~',
+            'comes': '~,,',
+            'cums': '~,,',
+            'came': '~;',
+            'cummed': '~;',
+            'coming': '~`>',
+            'cumming': '~`>',
+            'miss': 'o',
+            'missed': 'o;',
+            'missing': 'o`>',
+            'misses': 'o,,',
+            'she': ')',
+            'he': '(',
+            "she's": '),,',
+            "he's": '(,,',
+            'her': ')4//',
+            'him': '(`@',
+            'his': '(`/',
+            'hers': ')4//,,',
+        };
+
+        // Reverse terms for decoding
+        const reverseTerms = {};
+        for (const [word, code] of Object.entries(terms)) {
+            if (!reverseTerms[code]) {
+                reverseTerms[code] = word;
+            }
+        }
+
+        // Sounds - phonetic patterns (check second)
+        // REMOVED due to conflicts with letters:
+        //   'hay','eh','uh' (conflict with h,e,u)
+        //   'ph' (conflicts with f - both use })
+        //   'dg' (conflicts with j - both use _)
+        const sounds = {
+            'ought': '&',
+            'ough': '&',
+            'tr': 'V',
+            'th': '{',
+            'sh': '$',
+            'st': '[',
+            'sp': ']',
+            'sk': '<',
+            'sw': '.b',
+            'ng': '>',
+            'nt': '.y',
+            'nd': '.v',
+            'rd': '.h',
+            'rk': '.w',
+            'ld': '.o',
+            'lt': '.j',
+            'ee': '^',
+            'ey': '7',
+            'ay': 'M',
+            'oo': '"',
+        };
+
+        // Reverse sounds for decoding
+        const reverseSounds = {};
+        for (const [sound, code] of Object.entries(sounds)) {
+            if (!reverseSounds[code]) {
+                reverseSounds[code] = sound;
+            }
+        }
+
+        // Letters - individual characters (check last)
+        const letters = {
+            'a': '-',
+            'b': 'x',
+            'c': '*',
+            'd': ';',
+            'e': '4',
+            'f': '}',
+            'g': 'C',
+            'h': '5',
+            'i': '`',
+            'j': '_',
+            'k': '~*',
+            'l': '?',
+            'm': '@',
+            'n': ':',
+            'o': '3',
+            'p': '.e',
+            'q': '*!',
+            'r': '//',
+            's': ',,',
+            't': '\\\\',
+            'u': '2',
+            'v': '|',
+            'w': '!',
+            'x': '*,,',
+            'y': '.^',
+            'z': '6',
+        };
+
+        // Reverse letters for decoding
+        const reverseLetters = {};
+        for (const [letter, code] of Object.entries(letters)) {
+            if (!reverseLetters[code]) {
+                reverseLetters[code] = letter;
+            }
+        }
+
+        // Punctuation
+        const punctuation = {
+            '.': '..',
+            '?': '**',
+            '!': '!',
+            ',': ',',
+            "'": "'",
+            '"': '"',
+            ' ': ' ',
+            '\n': '\n',
+        };
+
+        const reversePunctuation = {};
+        for (const [char, code] of Object.entries(punctuation)) {
+            if (!reversePunctuation[code]) {
+                reversePunctuation[code] = char;
+            }
+        }
+
+        // Track direction to prevent swap corruption
+        let lastDirection = 'encode';
+
+        function detectMode(text) {
+            if (!text.trim()) return 'encode';
+
+            // Check for Soul Code specific characters
+            const soulCodeChars = /[{}\[\]<>|`~@#$%^&;:\/\\]/.test(text);
+            const alphaRatio = (text.match(/[a-zA-Z]/g) || []).length / text.length;
+
+            if (alphaRatio > 0.6) return 'encode';
+            if (soulCodeChars && alphaRatio < 0.3) return 'decode';
+            return 'encode';
+        }
+
+        function encode(text) {
+            const input = text.toLowerCase();
+            let result = '';
+            let i = 0;
+
+            while (i < input.length) {
+                let matched = false;
+
+                // 1. Check terms first (longest match)
+                for (const [term, code] of Object.entries(terms).sort((a, b) => b[0].length - a[0].length)) {
+                    if (input.substring(i).startsWith(term)) {
+                        const beforeOk = i === 0 || /[\s.,!?']/.test(input[i - 1]);
+                        const afterOk = i + term.length >= input.length || /[\s.,!?']/.test(input[i + term.length]);
+                        if (beforeOk && afterOk) {
+                            result += code;
+                            i += term.length;
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                if (matched) continue;
+
+                // 2. Check sounds (phonetic patterns)
+                for (const [sound, code] of Object.entries(sounds).sort((a, b) => b[0].length - a[0].length)) {
+                    if (input.substring(i).startsWith(sound)) {
+                        result += code;
+                        i += sound.length;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (matched) continue;
+
+                // 3. Check punctuation
+                if (punctuation[input[i]]) {
+                    result += punctuation[input[i]];
+                    i++;
+                    continue;
+                }
+
+                // 4. Check individual letters
+                if (letters[input[i]]) {
+                    result += letters[input[i]];
+                    i++;
+                    continue;
+                }
+
+                // 5. Keep unknown characters as-is
+                result += input[i];
+                i++;
+            }
+
+            return result;
+        }
+
+        function decode(text) {
+            let result = '';
+            let i = 0;
+
+            // Build all codes sorted by length (longest first)
+            const allCodes = [
+                ...Object.entries(reverseTerms),
+                ...Object.entries(reverseSounds),
+                ...Object.entries(reverseLetters),
+                ...Object.entries(reversePunctuation),
+            ].sort((a, b) => b[0].length - a[0].length);
+
+            while (i < text.length) {
+                let matched = false;
+
+                for (const [code, value] of allCodes) {
+                    if (text.substring(i).startsWith(code)) {
+                        result += value;
+                        i += code.length;
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched) {
+                    result += text[i];
+                    i++;
+                }
+            }
+
+            return result;
+        }
+
+        function translate() {
+            const input = document.getElementById('input').value;
+            lastDirection = detectMode(input);
+
+            const output = lastDirection === 'encode' ? encode(input) : decode(input);
+            document.getElementById('output').value = output;
+
+            updateLabels();
+            updateStats(input, output);
+        }
+
+        function swapFields() {
+            const inputEl = document.getElementById('input');
+            const outputEl = document.getElementById('output');
+
+            const temp = inputEl.value;
+            inputEl.value = outputEl.value;
+            outputEl.value = temp;
+
+            // Flip direction instead of re-detecting to prevent corruption
+            lastDirection = lastDirection === 'encode' ? 'decode' : 'encode';
+
+            // Re-translate with flipped direction
+            const newOutput = lastDirection === 'encode'
+                ? encode(inputEl.value)
+                : decode(inputEl.value);
+            outputEl.value = newOutput;
+
+            updateLabels();
+            updateStats(inputEl.value, newOutput);
+        }
+
+        function updateLabels() {
+            const inputLabel = document.getElementById('inputLabel');
+            const outputLabel = document.getElementById('outputLabel');
+
+            if (lastDirection === 'encode') {
+                inputLabel.textContent = 'English';
+                outputLabel.textContent = 'Soul Code';
+            } else {
+                inputLabel.textContent = 'Soul Code';
+                outputLabel.textContent = 'English';
+            }
+        }
+
+        function updateStats(input, output) {
+            const inputStats = document.getElementById('inputStats');
+            const outputStats = document.getElementById('outputStats');
+
+            inputStats.textContent = `${input.length} chars`;
+
+            if (input.length > 0 && output.length > 0) {
+                const ratio = ((1 - output.length / input.length) * 100).toFixed(0);
+                const sign = ratio >= 0 ? '-' : '+';
+                outputStats.textContent = `${output.length} chars (${sign}${Math.abs(ratio)}%)`;
+            } else {
+                outputStats.textContent = `${output.length} chars`;
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').value = '';
+            document.getElementById('inputStats').textContent = '';
+            document.getElementById('outputStats').textContent = '';
+            document.getElementById('inputLabel').textContent = 'Input';
+            document.getElementById('outputLabel').textContent = 'Output';
+            lastDirection = 'encode';
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output');
+            navigator.clipboard.writeText(output.value).then(() => {
+                showToast('Copied!');
+            });
+        }
+
+        async function compress(string) {
+            const byteArray = new TextEncoder().encode(string);
+            const stream = new CompressionStream('deflate-raw');
+            const writer = stream.writable.getWriter();
+            writer.write(byteArray);
+            writer.close();
+            const buffer = await new Response(stream.readable).arrayBuffer();
+            return new Uint8Array(buffer).toBase64({alphabet: 'base64url'});
+        }
+
+        async function shareToTextarea() {
+            const output = document.getElementById('output').value;
+            if (!output.trim()) {
+                showToast('Nothing to share');
+                return;
+            }
+            try {
+                const hash = await compress(output);
+                const url = 'https://textarea.0pon.com/#' + hash;
+                await navigator.clipboard.writeText(url);
+                showToast('Link copied!');
+            } catch (e) {
+                showToast('Share failed');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        }
+
+        function toggleReference() {
+            const content = document.getElementById('refContent');
+            const toggle = document.getElementById('refToggle');
+            content.classList.toggle('open');
+            toggle.textContent = content.classList.contains('open') ? '-' : '+';
+        }
+
+        // Initialize
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+        }
+
+        // Real-time translation
+        document.getElementById('input').addEventListener('input', translate);
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
