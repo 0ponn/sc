@@ -248,13 +248,59 @@
             color: var(--text);
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            text-decoration: none;
             font-size: 0.85rem;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
         .feedback-btn:hover {
             border-color: var(--accent);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .modal textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
         }
 
         .toast {
@@ -336,12 +382,10 @@
                             <li><span>%</span> = and</li>
                             <li><span>(</span> = he</li>
                             <li><span>)</span> = she</li>
-                            <li><span>~</span> = come/cum</li>
+                            <li><span>~</span> = come</li>
                             <li><span>o</span> = miss</li>
                             <li><span>#</span> = kill</li>
                             <li><span>##</span> = murder</li>
-                            <li><span>jk</span> = just kidding</li>
-                            <li><span>IRL</span> = in real life</li>
                             <li><span>..</span> = period (.)</li>
                             <li><span>**</span> = question (?)</li>
                             <li><span>;</span> = past tense / d</li>
@@ -389,8 +433,20 @@
         </div>
     </div>
 
-    <a href="https://linear.app/0pon/team/0PO/new?title=%5Bsc%5D%20" target="_blank" class="feedback-btn">Feedback</a>
+    <button onclick="openFeedback()" class="feedback-btn">Feedback</button>
     <div class="toast" id="toast"></div>
+
+    <div class="modal-overlay" id="feedbackModal" onclick="closeFeedback(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2>Feedback</h2>
+            <p>Report a cipher bug, suggest a new mapping, or share ideas.</p>
+            <textarea id="feedbackText" placeholder="e.g., 'ow' sound should map to single quote"></textarea>
+            <div class="modal-actions">
+                <button onclick="closeFeedback()">Cancel</button>
+                <button class="btn-primary" onclick="submitFeedback()">Submit</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Terms - full words (check first)
@@ -770,6 +826,93 @@
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+
+        // Listen for cipher updates via SSE
+        const events = new EventSource('/events');
+        events.onmessage = (e) => {
+            if (e.data === 'updated') {
+                notifyUpdate();
+            }
+        };
+
+        // Request notification permission on first interaction
+        document.addEventListener('click', () => {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }, { once: true });
+
+        function notifyUpdate() {
+            // Browser notification (works even when tab not focused)
+            if (Notification.permission === 'granted') {
+                const n = new Notification('Soul Code Updated', {
+                    body: 'Cipher has been updated. Click to refresh.',
+                    icon: '/icon-192.svg',
+                    requireInteraction: true
+                });
+                n.onclick = () => {
+                    window.focus();
+                    location.reload();
+                    n.close();
+                };
+            } else {
+                // Fallback: persistent banner
+                showUpdateBanner();
+            }
+        }
+
+        function showUpdateBanner() {
+            if (document.getElementById('updateBanner')) return;
+            const banner = document.createElement('div');
+            banner.id = 'updateBanner';
+            banner.innerHTML = 'Cipher updated - <a href="#" onclick="location.reload()">refresh</a>';
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--accent);color:var(--bg);padding:0.5rem;text-align:center;font-size:0.85rem;z-index:200;';
+            banner.querySelector('a').style.color = 'inherit';
+            document.body.prepend(banner);
+        }
+
+        function openFeedback() {
+            document.getElementById('feedbackModal').classList.add('open');
+            document.getElementById('feedbackText').focus();
+        }
+
+        function closeFeedback(e) {
+            if (!e || e.target === e.currentTarget) {
+                document.getElementById('feedbackModal').classList.remove('open');
+                document.getElementById('feedbackText').value = '';
+            }
+        }
+
+        async function submitFeedback() {
+            const text = document.getElementById('feedbackText').value.trim();
+            if (!text) {
+                showToast('Please enter feedback');
+                return;
+            }
+
+            try {
+                const res = await fetch('https://sc.0pon.com/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'Feedback',
+                        action: 'create',
+                        data: { title: '[sc] ' + text.substring(0, 50), description: text }
+                    })
+                });
+
+                if (res.ok) {
+                    showToast('Feedback sent!');
+                    closeFeedback();
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                // Fallback to Linear
+                window.open('https://linear.app/0pon/team/0PO/new?title=' + encodeURIComponent('[sc] ' + text.substring(0, 50)), '_blank');
+                closeFeedback();
+            }
         }
     </script>
 </body>
