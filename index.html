@@ -823,9 +823,18 @@
         // Real-time translation
         document.getElementById('input').addEventListener('input', translate);
 
-        // Register service worker for PWA
+        // Register service worker for PWA with update detection
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
+            navigator.serviceWorker.register('/sw.js').then(reg => {
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            notifyUpdate();
+                        }
+                    });
+                });
+            }).catch(() => {});
         }
 
         // Listen for cipher updates via SSE
