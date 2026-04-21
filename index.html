@@ -379,16 +379,25 @@
                         <h3>Terms</h3>
                         <ul>
                             <li><span>+</span> = love</li>
+                            <li><span>+;</span> = loved</li>
+                            <li><span>+`></span> = loving</li>
                             <li><span>%</span> = and</li>
                             <li><span>(</span> = he</li>
+                            <li><span>(`@</span> = him</li>
+                            <li><span>(`/</span> = his</li>
                             <li><span>)</span> = she</li>
-                            <li><span>~</span> = come</li>
+                            <li><span>)4//</span> = her</li>
+                            <li><span>)4//,,</span> = hers</li>
+                            <li><span>~</span> = come/cum</li>
                             <li><span>o</span> = miss</li>
+                            <li><span>o;</span> = missed</li>
+                            <li><span>o`></span> = missing</li>
                             <li><span>#</span> = kill</li>
+                            <li><span>#;</span> = killed</li>
                             <li><span>##</span> = murder</li>
-                            <li><span>..</span> = period (.)</li>
-                            <li><span>**</span> = question (?)</li>
-                            <li><span>;</span> = past tense / d</li>
+                            <li><span>jk</span> = just kidding</li>
+                            <li><span>IRL</span> = in real life</li>
+                            <li><span>M?^4:,,</span> = aliens</li>
                         </ul>
                     </div>
                     <div class="ref-section">
@@ -398,8 +407,8 @@
                             <li><span>$</span> = sh</li>
                             <li><span>[</span> = st</li>
                             <li><span>]</span> = sp</li>
-                            <li><span><</span> = sk</li>
-                            <li><span>></span> = ng</li>
+                            <li><span>&lt;</span> = sk</li>
+                            <li><span>&gt;</span> = ng</li>
                             <li><span>V</span> = tr</li>
                             <li><span>.y</span> = nt</li>
                             <li><span>.v</span> = nd</li>
@@ -408,31 +417,67 @@
                             <li><span>.o</span> = ld</li>
                             <li><span>.j</span> = lt</li>
                             <li><span>.b</span> = sw</li>
-                            <li><span>&</span> = ought</li>
+                            <li><span>&amp;</span> = ought/ough</li>
                             <li><span>'</span> = ow</li>
-                        </ul>
-                    </div>
-                    <div class="ref-section">
-                        <h3>Vowels/Letters</h3>
-                        <ul>
-                            <li><span>"</span> = oo</li>
                             <li><span>^</span> = ee</li>
                             <li><span>7</span> = ey</li>
                             <li><span>M</span> = ay/eye</li>
-                            <li><span>5</span> = h</li>
+                            <li><span>"</span> = oo</li>
+                        </ul>
+                    </div>
+                    <div class="ref-section">
+                        <h3>Letters</h3>
+                        <ul>
+                            <li><span>-</span> = a</li>
+                            <li><span>X</span> = b</li>
+                            <li><span>*</span> = c</li>
+                            <li><span>;</span> = d</li>
                             <li><span>4</span> = e</li>
-                            <li><span>2</span> = u</li>
-                            <li><span>`</span> = i</li>
-                            <li><span>3</span> = o</li>
                             <li><span>}</span> = f</li>
+                            <li><span>C</span> = g</li>
+                            <li><span>5</span> = h</li>
+                            <li><span>`</span> = i</li>
                             <li><span>_</span> = j</li>
+                            <li><span>~*</span> = k</li>
+                            <li><span>?</span> = l</li>
+                            <li><span>@</span> = m</li>
+                            <li><span>:</span> = n</li>
+                            <li><span>3</span> = o</li>
+                            <li><span>.e</span> = p</li>
+                            <li><span>*!</span> = q</li>
+                            <li><span>//</span> = r</li>
+                            <li><span>,,</span> = s</li>
+                            <li><span>\\</span> = t</li>
+                            <li><span>2</span> = u</li>
+                            <li><span>|</span> = v</li>
+                            <li><span>!</span> = w</li>
+                            <li><span>*,,</span> = x</li>
+                            <li><span>.^</span> = y</li>
+                            <li><span>6</span> = z</li>
+                        </ul>
+                    </div>
+                    <div class="ref-section">
+                        <h3>Punctuation</h3>
+                        <ul>
+                            <li><span>..</span> = period (.)</li>
+                            <li><span>**</span> = question (?)</li>
+                            <li><span>!</span> = exclaim (!)</li>
+                            <li><span>,</span> = comma</li>
+                            <li><span>x</span> = space</li>
+                        </ul>
+                    </div>
+                    <div class="ref-section">
+                        <h3>Modifiers</h3>
+                        <ul>
+                            <li><span>;</span> = past tense (-ed)</li>
+                            <li><span>`&gt;</span> = -ing</li>
+                            <li><span>,,</span> = plural (-s)</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <button onclick="openFeedback()" class="feedback-btn">Feedback</button>
     <div class="toast" id="toast"></div>
 
@@ -536,7 +581,7 @@
         // Letters - individual characters (check last)
         const letters = {
             'a': '-',
-            'b': 'x',
+            'b': 'X',
             'c': '*',
             'd': ';',
             'e': '4',
@@ -578,7 +623,7 @@
             '!': '!',
             ',': ',',
             '"': '"',
-            ' ': ' ',
+            ' ': 'x',
             '\n': '\n',
         };
 
@@ -651,6 +696,7 @@
                     i++;
                     continue;
                 }
+
 
                 // 5. Keep unknown characters as-is
                 result += input[i];
@@ -837,8 +883,12 @@
             }).catch(() => {});
         }
 
+        // Generate unique session ID
+        const sessionId = localStorage.getItem('sc-session') || crypto.randomUUID();
+        localStorage.setItem('sc-session', sessionId);
+
         // Listen for cipher updates via SSE
-        const events = new EventSource('/events');
+        const events = new EventSource('/events?session=' + sessionId);
         events.onmessage = (e) => {
             if (e.data === 'updated') {
                 notifyUpdate();
