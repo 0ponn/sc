@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sc-invite",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-21",
+  "account_id": "7eabf09af7fd61aa4cd65369710e452e",
+
+  // Route: Worker handles invite page at sc.0pon.com/join
+  "routes": [
+    { "pattern": "sc.0pon.com/join*", "zone_name": "0pon.com" }
+  ],
+
+  // KV namespace for invite codes - auto-created on first deploy
+  "kv_namespaces": [
+    { "binding": "INVITE_CODES" }
+  ],
+
+  // Secrets to set via CLI:
+  // wrangler secret put ADMIN_SECRET
+  // wrangler secret put LINEAR_API_KEY
+  // wrangler secret put RESEND_API_KEY
+  // wrangler secret put CLERK_SECRET_KEY
+}

@@ -1,0 +1,7 @@
+[allowlist]
+description = "Allowlist for Clerk publishable keys (meant to be public)"
+regexTarget = "match"
+regexes = [
+    '''pk_test_[A-Za-z0-9]+''',
+    '''pk_live_[A-Za-z0-9]+'''
+]
