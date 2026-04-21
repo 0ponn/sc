@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soul-code-v3';
+const CACHE_NAME = 'soul-code-v4';
 const urlsToCache = [
   '/',
   '/index.html',
